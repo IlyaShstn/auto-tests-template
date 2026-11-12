@@ -1,0 +1,75 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  api-tests:
+    name: API-тесты
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Установить зависимости
+        run: pip install -r requirements.txt
+
+      - name: Запустить API-тесты
+        run: pytest tests/api
+
+      - name: Сформировать Allure-отчёт
+        if: always()
+        run: |
+          curl -sL -o /tmp/allure.tgz https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+          tar -xzf /tmp/allure.tgz -C /tmp
+          /tmp/allure-2.24.0/bin/allure generate reports/allure-results -o reports/allure-report --clean
+
+      - name: Сохранить отчёты
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-api
+          path: |
+            reports/report.html
+            reports/allure-report
+          retention-days: 7
+
+  ui-tests:
+    name: UI-тесты (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Установить зависимости
+        run: pip install -r requirements.txt
+
+      - name: Установить браузеры Playwright
+        run: playwright install --with-deps chromium
+
+      - name: Запустить UI-тесты
+        run: pytest tests/ui
+
+      - name: Сформировать Allure-отчёт
+        if: always()
+        run: |
+          curl -sL -o /tmp/allure.tgz https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+          tar -xzf /tmp/allure.tgz -C /tmp
+          /tmp/allure-2.24.0/bin/allure generate reports/allure-results -o reports/allure-report --clean
+
+      - name: Сохранить отчёты
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-ui
+          path: |
+            reports/report.html
+            reports/allure-report
+          retention-days: 7
