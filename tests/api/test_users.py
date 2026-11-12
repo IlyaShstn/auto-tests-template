@@ -8,8 +8,10 @@ pytestmark = [pytest.mark.api, allure.feature("Управление пользо
 class TestGetUsers:
     @allure.title("Список пользователей второй страницы")
     @pytest.mark.smoke
-    def test_get_users_list(self, auth_client, base_url):
-        response = auth_client.get(f"{base_url}/users", params={"page": 2})
+    def test_get_users_list(self, api_client, base_url):
+        # Примечание: против reqres.in запрос идёт анонимно — стенд отвечает 401
+        # на Authorization: Bearer (см. фикстуру auth_client для своего стенда).
+        response = api_client.get(f"{base_url}/users", params={"page": 2})
         assert response.status_code == 200
         body = response.json()
         assert body["page"] == 2

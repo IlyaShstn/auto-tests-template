@@ -54,6 +54,9 @@ def auth_client(auth_token, base_url):
 
     Не переиспользует api_client: иначе заголовок Authorization протечёт
     в остальные тесты, и стенд, проверяющий авторизацию, начнёт отвечать 401.
+
+    Против демо-стенда reqres.in не работает: он отвечает 401 на Bearer без
+    валидного ключа. Пригодится на собственном стенде с авторизацией.
     """
     session = requests.Session()
     session.headers.update({

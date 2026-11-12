@@ -85,7 +85,9 @@ pytest tests/ui --browser chromium --browser firefox
 
 - `api_client` (scope="session") — HTTP-сессия `requests`;
 - `auth_token` (scope="session") — токен из `/login`, запрашивается один раз за прогон;
-- `auth_client` (scope="session") — сессия с заголовком `Authorization`;
+- `auth_client` (scope="session") — отдельная сессия с заголовком `Authorization`
+  (для собственного стенда с авторизацией; против reqres.in не используется —
+  он отвечает 401 на `Bearer` без валидного ключа, поэтому тесты идут анонимно);
 - `user_payload` — фабрика уникальных данных (uuid при каждом вызове);
 - `created_user` — создаёт пользователя перед тестом и удаляет его после
   (`yield`-фикстура с тирдауном).
